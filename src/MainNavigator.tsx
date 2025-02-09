@@ -1,24 +1,23 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
-import { useAuth } from "./providers/auth";
-import { ActivityIndicator, Text, View } from "react-native";
 import { RootNavigator } from "./navigation/RootNavigator";
 import { AuthNavigator } from "./navigation/AuthNavigator";
+import { AnimatedSplashScreen } from "./shared/SplashScreen";
+import { useAuthStore } from "./store/authStore";
 
 const NativeStack = createNativeStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
 
-const LoadingScreen = () => <Text>Loading...</Text>;
-
 const App = () => {
-	const auth = useAuth();
-	if (auth.isLoading) return <LoadingScreen />;
+	const auth = useAuthStore();
+
+	if (auth.isLoading) return <AnimatedSplashScreen />;
 
 	return (
 		<NativeStack.Navigator>
-			{!auth.session ? (
+			{!auth.accessToken ? (
 				<NativeStack.Screen
 					name="auth"
 					component={AuthNavigator}

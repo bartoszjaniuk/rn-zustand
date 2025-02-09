@@ -20,7 +20,7 @@ enableFreeze(true); // avoid unnecessary re-renders of parts of the app that are
 SplashScreen.preventAutoHideAsync();
 
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
-	return <AuthProvider>{children}</AuthProvider>;
+	return <>{children}</>;
 };
 
 const ErrorFallback = () => {

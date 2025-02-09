@@ -1,16 +1,16 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Button } from "react-native";
-import { useAuth } from "../providers/auth";
+import { useAuthStore } from "../store/authStore";
 
 const NativeStack = createNativeStackNavigator();
 
 const HomeScreen = () => {
-	const auth = useAuth();
+	const auth = useAuthStore();
 	return (
 		<View>
 			<Text>HomeScreen</Text>
-			<Button title="Wyloguj" onPress={auth.signOut} />
+			<Button title="Wyloguj" onPress={auth.logout} />
 		</View>
 	);
 };

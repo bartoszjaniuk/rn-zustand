@@ -1,16 +1,21 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Button } from "react-native";
-import { useAuth } from "../providers/auth";
+import { useAuthStore } from "../store/authStore";
 
 const NativeStack = createNativeStackNavigator();
 
 const WelcomeScreen = () => {
-	const auth = useAuth();
+	const auth = useAuthStore();
+	const handleLogin = async () => {
+		await auth.login({ email: "user@gg.pl", password: "password" });
+	};
+
 	return (
 		<View>
 			<Text>WelcomeScreen</Text>
-			<Button title="Login" onPress={() => auth.signIn("xd")} />
+			{auth.error ? <Text>{auth.error}</Text> : null}
+			<Button title="Login" onPress={handleLogin} />
 		</View>
 	);
 };
