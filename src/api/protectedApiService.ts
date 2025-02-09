@@ -1,14 +1,11 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { API_URL } from "./api.consts";
+import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import httpClient from "./httpClient";
 
-export abstract class ApiService {
+export abstract class ProtectedApiService {
   protected httpClient: AxiosInstance;
 
   constructor() {
-    this.httpClient = axios.create({
-      baseURL: API_URL,
-      withCredentials: true,
-    });
+    this.httpClient = httpClient;
   }
 
   protected responseHandler<T = unknown>({ data }: AxiosResponse<T>) {

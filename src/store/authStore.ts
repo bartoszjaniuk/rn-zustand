@@ -1,95 +1,99 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { authService } from "../api/auth/auth.service";
 import secureStorage from "./utils/secureStorage";
 import { createSelectors } from "./utils/createSelectors";
 import { AxiosError } from "axios";
+import { authService } from "../api/auth/auth.service";
+import { userService } from "../api/user/user.service";
 
 type User = {
-	id: string;
-	email: string;
-	name: string;
+  id: string;
+  email: string;
+  name: string | null;
 };
 
 type AuthState = {
-	accessToken: string | null;
-	refreshToken: string | null;
-	// user: User | null;
-	isLoading: boolean;
-	error: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  user: User | null;
+  isLoading: boolean;
+  error: string | null;
 };
 
 type AuthActions = {
-	login: (userCredentials: UserCredentials) => Promise<void>;
-	logout: () => void;
-	refreshAccessToken: () => Promise<void>;
-	setLoading: (loading: boolean) => void;
+  login: (userCredentials: UserCredentials) => Promise<void>;
+  logout: () => void;
+  setLoading: (loading: boolean) => void;
+  userInfo: () => Promise<void>;
+  setTokens: (accessToken: string, refreshToken: string) => void;
 };
 
 type AuthStore = AuthState & AuthActions;
 
 type UserCredentials = {
-	email: string;
-	password: string;
+  email: string;
+  password: string;
 };
 
 export const useAuthStore = create<AuthStore>()(
-	persist(
-		(set, get) => ({
-			accessToken: null,
-			refreshToken: null,
-			isLoading: false,
-			error: null,
-			login: async (userCredentials: UserCredentials) => {
-				set({ isLoading: true, error: null });
-				try {
-					const res = await authService.login(userCredentials);
-
-					console.log(res, "res");
-					set({
-						accessToken: res.accessToken,
-						refreshToken: res.refreshToken,
-						isLoading: false,
-					});
-				} catch (error) {
-					if (error instanceof AxiosError) {
-						set({ error: error.response?.data.message, isLoading: false });
-					}
-
-					set({ error: "Something went very wrong", isLoading: false });
-				}
-			},
-			logout: () => {
-				set({ accessToken: null, refreshToken: null });
-			},
-			refreshAccessToken: async () => {
-				const { refreshToken } = get();
-				if (!refreshToken) return;
-
-				set({ isLoading: true });
-				try {
-					const response = await authService.refreshToken();
-					set({
-						accessToken: response.accessToken,
-						refreshToken: response.refreshToken,
-						isLoading: false,
-					});
-				} catch (error) {
-					set({ error: "Failed to refresh token", isLoading: false });
-				}
-			},
-			setLoading: (isLoading: boolean) => set({ isLoading }),
-		}),
-		{
-			name: "auth-storage",
-			storage: createJSONStorage(() => secureStorage),
-			// Enables to pick some of the state's fields to be stored in the storage.
-			partialize: (state) => ({
-				accessToken: state.accessToken,
-				refreshToken: state.refreshToken,
-			}),
-		},
-	),
+  persist(
+    (set, get) => ({
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      isLoading: false,
+      error: null,
+      login: async (userCredentials: UserCredentials) => {
+        set({ isLoading: true, error: null });
+        try {
+          const res = await authService.login(userCredentials);
+          set({
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+            isLoading: false,
+          });
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            set({ error: error.response?.data.message, isLoading: false });
+          } else {
+            set({ error: "Something went very wrong", isLoading: false });
+          }
+        }
+      },
+      logout: async () => {
+        set((state) => ({
+          ...state,
+          accessToken: null,
+          refreshToken: null,
+          user: null,
+          error: null,
+        }));
+      },
+      setTokens: (accessToken: string, refreshToken: string) => {
+        set({ accessToken, refreshToken });
+      },
+      userInfo: async () => {
+        try {
+          const user = await userService.getUserInfo();
+          console.log("user");
+          set({ user });
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            set({ error: error.response?.data.message, isLoading: false });
+          }
+        }
+      },
+      setLoading: (isLoading: boolean) => set({ isLoading }),
+    }),
+    {
+      name: "auth-storage",
+      storage: createJSONStorage(() => secureStorage),
+      partialize: (state) => ({
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+      }),
+    }
+  )
 );
 
 export const useAuthSelectors = createSelectors(useAuthStore);

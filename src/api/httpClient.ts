@@ -1,36 +1,66 @@
-import * as SecureStore from "expo-secure-store";
-
 import axios, { AxiosInstance } from "axios";
-import { API_URL, ACCESS_TOKEN } from "./api.consts";
+import { API_URL } from "./api.consts";
+import { useAuthStore } from "../store/authStore";
+import { userService } from "./user/user.service";
 
-const httpClient: AxiosInstance = axios.create({
-	baseURL: API_URL,
-	withCredentials: true,
+export const httpClient: AxiosInstance = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
 });
 
+let isRefreshing = false;
+let failedRequests = [];
+
 httpClient.interceptors.request.use(
-	async (config) => {
-		const token = await SecureStore.getItemAsync(ACCESS_TOKEN);
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`;
-		}
-		return config;
-	},
-	(error) => {
-		return Promise.reject(error);
-	},
+  async (config) => {
+    const { accessToken } = useAuthStore.getState();
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
-// export const setupAxiosInterceptors = (signOut: () => void) => {
-// 	httpClient.interceptors.response.use(
-// 		(response) => response,
-// 		(error) => {
-// 			if (error.response && error.response.status === 401) {
-// 				signOut();
-// 			}
-// 			return Promise.reject(error);
-// 		},
-// 	);
-// };
+httpClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          failedRequests.push(() => resolve(httpClient(originalRequest)));
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const tokens = await userService.refreshToken();
+        if (tokens) {
+          console.log(tokens, "tokens");
+          useAuthStore
+            .getState()
+            .setTokens(tokens.accessToken, tokens.refreshToken);
+        }
+        originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
+        failedRequests.forEach((cb) => cb());
+        failedRequests = [];
+        return httpClient(originalRequest);
+      } catch (refreshError) {
+        await useAuthStore.getState().logout();
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default httpClient;
