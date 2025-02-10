@@ -1,49 +1,64 @@
-import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import httpClient from "./httpClient";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { API_URL } from "./api.consts";
+import {
+  errorInterceptor,
+  identityInterceptor,
+  jwtInterceptor,
+  refreshTokenInterceptor,
+} from "./interceptors";
 
 export abstract class ApiService {
-	protected httpClient: AxiosInstance;
+  protected httpClient: AxiosInstance;
 
-	constructor() {
-		this.httpClient = httpClient;
-	}
+  constructor() {
+    this.httpClient = axios.create({
+      baseURL: API_URL,
+      withCredentials: true,
+    });
 
-	protected responseHandler<T = unknown>({ data }: AxiosResponse<T>) {
-		return data;
-	}
+    this.httpClient.interceptors.request.use(jwtInterceptor, errorInterceptor);
 
-	protected async get<T = unknown>(url: string, config?: AxiosRequestConfig) {
-		return await this.httpClient.get<T>(url, config);
-	}
+    this.httpClient.interceptors.response.use(identityInterceptor, (error) =>
+      refreshTokenInterceptor({ error, api: this.httpClient })
+    );
+  }
 
-	protected async post<T = unknown, B = unknown>(
-		url: string,
-		body: B,
-		config?: AxiosRequestConfig,
-	) {
-		return await this.httpClient.post<T>(url, body, config);
-	}
+  protected responseHandler<T = unknown>({ data }: AxiosResponse<T>) {
+    return data;
+  }
 
-	protected async put<T = unknown, B = unknown>(
-		url: string,
-		body: B,
-		config?: AxiosRequestConfig,
-	) {
-		return await this.httpClient.put<T>(url, body, config);
-	}
+  protected async get<T = unknown>(url: string, config?: AxiosRequestConfig) {
+    return await this.httpClient.get<T>(url, config);
+  }
 
-	protected async patch<T = unknown, B = unknown>(
-		url: string,
-		body?: B,
-		config?: AxiosRequestConfig,
-	) {
-		return await this.httpClient.patch<T>(url, body, config);
-	}
+  protected async post<T = unknown, B = unknown>(
+    url: string,
+    body: B,
+    config?: AxiosRequestConfig
+  ) {
+    return await this.httpClient.post<T>(url, body, config);
+  }
 
-	protected async delete<T = unknown>(
-		url: string,
-		config?: AxiosRequestConfig,
-	) {
-		return await this.httpClient.delete<T>(url, config);
-	}
+  protected async put<T = unknown, B = unknown>(
+    url: string,
+    body: B,
+    config?: AxiosRequestConfig
+  ) {
+    return await this.httpClient.put<T>(url, body, config);
+  }
+
+  protected async patch<T = unknown, B = unknown>(
+    url: string,
+    body?: B,
+    config?: AxiosRequestConfig
+  ) {
+    return await this.httpClient.patch<T>(url, body, config);
+  }
+
+  protected async delete<T = unknown>(
+    url: string,
+    config?: AxiosRequestConfig
+  ) {
+    return await this.httpClient.delete<T>(url, config);
+  }
 }
