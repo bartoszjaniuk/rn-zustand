@@ -1,29 +1,20 @@
-import { ProtectedApiService } from "../protectedApiService";
+import { ApiService } from "../baseApi";
 import { userQueryKeys } from "./user.keys";
 
-export class UserService extends ProtectedApiService {
-  constructor() {
-    super();
-  }
+export class UserService extends ApiService {
+	constructor() {
+		super();
+	}
 
-  refreshToken = async () => {
-    return this.responseHandler(
-      await this.httpClient.post<{ accessToken: string; refreshToken: string }>(
-        userQueryKeys.refreshToken(),
-        {}
-      )
-    );
-  };
-
-  getUserInfo = async () => {
-    return this.responseHandler(
-      await this.httpClient.get<{
-        id: string;
-        email: string;
-        name: string | null;
-      }>(userQueryKeys.userInfo())
-    );
-  };
+	getUserInfo = async () => {
+		return this.responseHandler(
+			await this.httpClient.get<{
+				id: string;
+				email: string;
+				name: string | null;
+			}>(userQueryKeys.userInfo()),
+		);
+	};
 }
 
 export const userService = new UserService();

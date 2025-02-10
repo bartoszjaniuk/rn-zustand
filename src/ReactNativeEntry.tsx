@@ -7,7 +7,6 @@ import ErrorBoundary from "react-native-error-boundary";
 import { StyleSheet, View } from "react-native";
 import { enableFreeze } from "react-native-screens";
 import { MainNavigator } from "./MainNavigator";
-import { AuthProvider } from "./providers/auth";
 
 Asset.loadAsync([
 	...NavigationAssets,

@@ -1,66 +1,56 @@
 import axios, { AxiosInstance } from "axios";
 import { API_URL } from "./api.consts";
 import { useAuthStore } from "../store/authStore";
-import { userService } from "./user/user.service";
+import { authService } from "./auth/auth.service";
 
 export const httpClient: AxiosInstance = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
+	baseURL: API_URL,
+	withCredentials: true,
 });
 
-let isRefreshing = false;
-let failedRequests = [];
-
 httpClient.interceptors.request.use(
-  async (config) => {
-    const { accessToken } = useAuthStore.getState();
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+	async (config) => {
+		const { accessToken } = useAuthStore.getState();
+		if (accessToken) {
+			config.headers.Authorization = `Bearer ${accessToken}`;
+		}
+		return config;
+	},
+	(error) => {
+		return Promise.reject(error);
+	},
 );
 
 httpClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+	(response) => response,
+	async (error) => {
+		const originalRequest = error.config;
+		const { refreshToken, setTokens, logout } = useAuthStore.getState();
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve) => {
-          failedRequests.push(() => resolve(httpClient(originalRequest)));
-        });
-      }
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			originalRequest._retry = true;
+			try {
+				const response = await axios.post(
+					`${API_URL}auth/refresh-token`,
+					{},
+					{ headers: { Authorization: `Bearer ${refreshToken}` } },
+				);
 
-      originalRequest._retry = true;
-      isRefreshing = true;
+				const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+					response.data;
 
-      try {
-        const tokens = await userService.refreshToken();
-        if (tokens) {
-          console.log(tokens, "tokens");
-          useAuthStore
-            .getState()
-            .setTokens(tokens.accessToken, tokens.refreshToken);
-        }
-        originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
-        failedRequests.forEach((cb) => cb());
-        failedRequests = [];
-        return httpClient(originalRequest);
-      } catch (refreshError) {
-        await useAuthStore.getState().logout();
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
-    }
+				setTokens(newAccessToken, newRefreshToken);
 
-    return Promise.reject(error);
-  }
+				originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+				return httpClient(originalRequest);
+			} catch (refreshError) {
+				logout();
+				return Promise.reject(refreshError);
+			}
+		}
+
+		return Promise.reject(error);
+	},
 );
 
 export default httpClient;

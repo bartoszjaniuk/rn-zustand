@@ -1,43 +1,42 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { authQueryKeys } from "./auth.keys";
-import { API_URL } from "../api.consts";
+import { ApiService } from "../baseApi";
 
-export class AuthService {
-  private httpClient: AxiosInstance;
+export class AuthService extends ApiService {
+	constructor() {
+		super();
+	}
 
-  constructor() {
-    this.httpClient = axios.create({
-      baseURL: API_URL,
-      withCredentials: true,
-    });
-  }
+	login = async (payload: { email: string; password: string }) => {
+		return this.responseHandler(
+			await this.httpClient.post<{ accessToken: string; refreshToken: string }>(
+				authQueryKeys.login(),
+				payload,
+			),
+		);
+	};
 
-  private responseHandler = <T = unknown>({ data }: AxiosResponse<T>) => {
-    return data;
-  };
+	register = async (payload: string) => {
+		return this.responseHandler(
+			await this.httpClient.post<Promise<void>>(authQueryKeys.register(), {
+				email: payload,
+			}),
+		);
+	};
 
-  login = async (payload: { email: string; password: string }) => {
-    return this.responseHandler(
-      await this.httpClient.post<{ accessToken: string; refreshToken: string }>(
-        authQueryKeys.login(),
-        payload
-      )
-    );
-  };
+	refreshToken = async () => {
+		return this.responseHandler(
+			await this.httpClient.post<{ accessToken: string; refreshToken: string }>(
+				authQueryKeys.refreshToken(),
+				{},
+			),
+		);
+	};
 
-  register = async (payload: string) => {
-    return this.responseHandler(
-      await this.httpClient.post<Promise<void>>(authQueryKeys.register(), {
-        email: payload,
-      })
-    );
-  };
-
-  logout = async () => {
-    return this.responseHandler(
-      await this.httpClient.post<Promise<void>>(authQueryKeys.logout(), {})
-    );
-  };
+	logout = async () => {
+		return this.responseHandler(
+			await this.httpClient.post<Promise<void>>(authQueryKeys.logout(), {}),
+		);
+	};
 }
 
 export const authService = new AuthService();
