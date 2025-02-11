@@ -2,10 +2,13 @@ import { useAuthStore } from "../store/authStore";
 import { authService } from "./auth/auth.service";
 
 export const refreshToken = async () => {
-  const { setTokens } = useAuthStore.getState();
-  const { accessToken, refreshToken } = await authService.refreshToken();
+	const store = useAuthStore.getState();
 
-  setTokens(accessToken, refreshToken);
+	const { accessToken, refreshToken } = await authService.refreshToken(
+		store.refreshToken as string,
+	);
 
-  return accessToken;
+	store.setTokens(accessToken, refreshToken);
+
+	return accessToken;
 };
