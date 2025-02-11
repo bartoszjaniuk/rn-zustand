@@ -8,8 +8,6 @@ const NativeStack = createNativeStackNavigator();
 
 const HomeScreen = () => {
 	const auth = useAuthStore();
-	console.log(auth.accessToken, "auth.accessToken");
-	console.log(auth.refreshToken, "auth.refreshToken");
 
 	//TEMPORARY
 	const getUserInfo = async () => {
