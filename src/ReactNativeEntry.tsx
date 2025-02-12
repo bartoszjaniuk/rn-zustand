@@ -7,6 +7,7 @@ import ErrorBoundary from "react-native-error-boundary";
 import { StyleSheet, View } from "react-native";
 import { enableFreeze } from "react-native-screens";
 import { MainNavigator } from "./MainNavigator";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 Asset.loadAsync([
 	...NavigationAssets,
@@ -18,8 +19,12 @@ enableFreeze(true); // avoid unnecessary re-renders of parts of the app that are
 
 SplashScreen.preventAutoHideAsync();
 
+const queyClient = new QueryClient();
+
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
-	return <>{children}</>;
+	return (
+		<QueryClientProvider client={queyClient}>{children}</QueryClientProvider>
+	);
 };
 
 const ErrorFallback = () => {

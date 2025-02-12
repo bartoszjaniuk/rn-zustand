@@ -2,19 +2,32 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Button } from "react-native";
 import { useAuthStore } from "../store/authStore";
+import { useLoginMutation } from "../api/auth/hooks/useLoginMutation";
 
 const NativeStack = createNativeStackNavigator();
 
 const WelcomeScreen = () => {
 	const auth = useAuthStore();
-	const handleLogin = async () => {
-		await auth.login({ email: "user@gg.pl", password: "password" });
+
+	const onLoginSuccess = (data: {
+		accessToken: string;
+		refreshToken: string;
+	}) => {
+		auth.setTokens(data.accessToken, data.refreshToken);
+	};
+
+	const loginMutation = useLoginMutation(onLoginSuccess);
+
+	const handleLogin = () => {
+		loginMutation.mutate({ email: "user@gg.pl", password: "password" });
 	};
 
 	return (
 		<View>
 			<Text>WelcomeScreen</Text>
-			{auth.error ? <Text>{auth.error}</Text> : null}
+			{loginMutation.error ? (
+				<Text>{loginMutation.error.response?.data.message}</Text>
+			) : null}
 			<Button title="Login" onPress={handleLogin} />
 		</View>
 	);
