@@ -1,42 +1,56 @@
 {
-	"expo": {
-		"name": "react-navigation-playground",
-		"slug": "react-navigation-playground",
-		"version": "1.0.0",
-		"orientation": "portrait",
-		"icon": "./assets/icon.png",
-		"userInterfaceStyle": "automatic",
-		"newArchEnabled": true,
-		"scheme": "reactnavigationplayground",
-		"ios": {
-			"supportsTablet": true,
-			"infoPlist": {
-				"NSAppTransportSecurity": {
-					"NSAllowsArbitraryLoads": true
-				}
-			}
-		},
-		"android": {
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/adaptive-icon.png",
-				"backgroundColor": "#ffffff"
-			},
-			"permissions": ["INTERNET"]
-		},
-		"web": {
-			"favicon": "./assets/favicon.png"
-		},
-		"plugins": [
-			"expo-asset",
-			[
-				"expo-splash-screen",
-				{
-					"backgroundColor": "#ffffff",
-					"image": "./assets/splash-icon.png"
-				}
-			],
-			"react-native-edge-to-edge",
-			"expo-secure-store"
-		]
-	}
+  "expo": {
+    "name": "react-navigation-playground",
+    "slug": "rn-zustand",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "scheme": "reactnavigationplayground",
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "bundleIdentifier": "com.i3artosh.rnzustand"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": ["INTERNET"],
+      "package": "com.i3artosh.rnzustand"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-asset",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/splash-icon.png"
+        }
+      ],
+      "react-native-edge-to-edge",
+      "expo-secure-store",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.614979262322-ch0ckq8qhj6svd1aotkde0f92cuhbeep"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2b0cd7c8-81f9-4517-aceb-325ac49da91a"
+      }
+    },
+    "owner": "i3artosh"
+  }
 }
