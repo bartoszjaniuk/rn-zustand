@@ -7,44 +7,36 @@ import ErrorBoundary from "react-native-error-boundary";
 import { StyleSheet, View } from "react-native";
 import { enableFreeze } from "react-native-screens";
 import { MainNavigator } from "./MainNavigator";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AppProviders } from "./shared/AppProviders";
 
 Asset.loadAsync([
-	...NavigationAssets,
-	require("./assets/newspaper.png"),
-	require("./assets/bell.png"),
+  ...NavigationAssets,
+  require("./assets/newspaper.png"),
+  require("./assets/bell.png"),
 ]);
 
 enableFreeze(true); // avoid unnecessary re-renders of parts of the app that are not visible to the user at a given moment.
 
 SplashScreen.preventAutoHideAsync();
 
-const queyClient = new QueryClient();
-
-const AppProviders = ({ children }: { children: React.ReactNode }) => {
-	return (
-		<QueryClientProvider client={queyClient}>{children}</QueryClientProvider>
-	);
-};
-
 const ErrorFallback = () => {
-	return <View>ErrorFallback</View>;
+  return <View>ErrorFallback</View>;
 };
 
 export const ReactNativeEntry = () => {
-	return (
-		<GestureHandlerRootView style={styles.root}>
-			<ErrorBoundary FallbackComponent={ErrorFallback}>
-				<AppProviders>
-					<MainNavigator />
-				</AppProviders>
-			</ErrorBoundary>
-		</GestureHandlerRootView>
-	);
+  return (
+    <GestureHandlerRootView style={styles.root}>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <AppProviders>
+          <MainNavigator />
+        </AppProviders>
+      </ErrorBoundary>
+    </GestureHandlerRootView>
+  );
 };
 
 const styles = StyleSheet.create({
-	root: {
-		flexGrow: 1,
-	},
+  root: {
+    flexGrow: 1,
+  },
 });
