@@ -18,7 +18,10 @@ export const HomeScreen = () => {
   return (
     <View>
       <Text>HomeScreen - {userInfoQuery.data?.email}</Text>
-      <Button title="Go to details" onPress={() => navigate.navigate('Details', { user: 'John Doe' })} />
+      <Button
+        title="Go to details"
+        onPress={() => navigate.navigate('Details', { user: 'John Doe' })}
+      />
       <Button title="Wyloguj" onPress={auth.logout} />
     </View>
   );

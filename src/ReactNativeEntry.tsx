@@ -1,18 +1,18 @@
-import { Assets as NavigationAssets } from "@react-navigation/elements";
-import { Asset } from "expo-asset";
-import * as SplashScreen from "expo-splash-screen";
-import * as React from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import ErrorBoundary from "react-native-error-boundary";
-import { StyleSheet, View } from "react-native";
-import { enableFreeze } from "react-native-screens";
-import { MainNavigator } from "./MainNavigator";
-import { AppProviders } from "./shared/AppProviders";
+import { Assets as NavigationAssets } from '@react-navigation/elements';
+import { Asset } from 'expo-asset';
+import * as SplashScreen from 'expo-splash-screen';
+import * as React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import ErrorBoundary from 'react-native-error-boundary';
+import { StyleSheet, View } from 'react-native';
+import { enableFreeze } from 'react-native-screens';
+import { MainNavigator } from './MainNavigator';
+import { AppProviders } from './shared/AppProviders';
 
 Asset.loadAsync([
   ...NavigationAssets,
-  require("./assets/newspaper.png"),
-  require("./assets/bell.png"),
+  require('./assets/newspaper.png'),
+  require('./assets/bell.png'),
 ]);
 
 enableFreeze(true); // avoid unnecessary re-renders of parts of the app that are not visible to the user at a given moment.

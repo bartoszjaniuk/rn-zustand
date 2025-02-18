@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
 
 import * as SecureStore from 'expo-secure-store';
 
@@ -28,7 +34,10 @@ type AuthAction =
   | { type: 'RESET_PASSWORD' }
   | { type: 'UPDATE_PROFILE'; data: any };
 
-const authReducer = (prevState: AuthContextType, action: AuthAction): AuthContextType => {
+const authReducer = (
+  prevState: AuthContextType,
+  action: AuthAction,
+): AuthContextType => {
   switch (action.type) {
     case 'RESTORE_TOKEN':
       return {
@@ -61,7 +70,9 @@ const authReducer = (prevState: AuthContextType, action: AuthAction): AuthContex
 };
 
 // AuthProvider component
-export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
@@ -123,7 +134,9 @@ export const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
     [state],
   );
 
-  return <AuthContext.Provider value={authContext}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={authContext}>{children}</AuthContext.Provider>
+  );
 };
 
 // Custom hook to use the AuthContext

@@ -1,12 +1,12 @@
-import { InternalAxiosRequestConfig } from "axios";
+import { InternalAxiosRequestConfig } from 'axios';
 
 export const jwtInterceptor = async (
-	config: InternalAxiosRequestConfig<any>,
-	getAccessToken: () => string | null,
+  config: InternalAxiosRequestConfig<any>,
+  getAccessToken: () => string | null,
 ) => {
-	const accessToken = getAccessToken();
-	if (accessToken) {
-		config.headers.Authorization = `Bearer ${accessToken}`;
-	}
-	return config;
+  const accessToken = getAccessToken();
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
 };

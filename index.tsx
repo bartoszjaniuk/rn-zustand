@@ -1,9 +1,9 @@
-import "./gesture-handler";
+import './gesture-handler';
 
-import "@expo/metro-runtime"; // Necessary for Fast Refresh on Web
-import { registerRootComponent } from "expo";
+import '@expo/metro-runtime'; // Necessary for Fast Refresh on Web
+import { registerRootComponent } from 'expo';
 
-import { ReactNativeEntry } from "./src/ReactNativeEntry";
+import { ReactNativeEntry } from './src/ReactNativeEntry';
 
 // registerRootComponent calls ReactNativeEntryRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,

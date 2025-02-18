@@ -1,3 +1,3 @@
 export const userQueryKeys = {
-	userInfo: () => "user/me",
+  userInfo: () => 'user/me',
 };
